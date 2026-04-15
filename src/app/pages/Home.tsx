@@ -179,23 +179,33 @@ export function Home() {
               transition={{ duration: 0.7 }}
             >
               {/* Badge */}
-              <motion.div
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-8 text-sm font-semibold"
-                style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(12px)' }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
-              >
-                {slide.badge}
-              </motion.div>
+              {slide.badge && (
+                <motion.div
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-8 text-sm font-semibold"
+                  style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(12px)' }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  {slide.badge}
+                </motion.div>
+              )}
 
               {/* Heading */}
               <h1
-                className="text-white mb-10"
-                style={{ fontSize: 'clamp(2.8rem, 6vw, 5.5rem)', fontFamily: 'Playfair Display, serif', lineHeight: 1.1, fontWeight: 800 }}
+                className="text-white mb-6"
+                style={{ fontSize: 'clamp(3rem, 8vw, 5.5rem)', fontFamily: 'Playfair Display, serif', lineHeight: 1.1, fontWeight: 900 }}
               >
-                {slide.heading1}
+                {slide.heading}
               </h1>
+
+              {/* Sub */}
+              <p
+                className="text-white/80 max-w-2xl mx-auto mb-10 text-lg md:text-xl font-medium"
+                style={{ lineHeight: 1.6 }}
+              >
+                {slide.description}
+              </p>
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

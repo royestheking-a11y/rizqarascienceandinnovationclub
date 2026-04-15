@@ -1,211 +1,271 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, Edit3, Save, X, Image as ImageIcon, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Plus, Trash2, Edit3, Image as ImageIcon, ExternalLink, ArrowRight } from 'lucide-react';
 import { fetchCarousel, createDoc, updateDoc, deleteDoc } from '../../data/api';
+import { AdminModal, AdminConfirm, FormField, FormActions } from '../../components/AdminCrudModal';
+import { ImageUpload } from '../../components/ImageUpload';
+import { toast } from 'sonner';
+
+const EMPTY = {
+  image: '',
+  badge: '',
+  heading: '',
+  description: '',
+  cta1Label: 'Join RSIC — Free',
+  cta1Href: '/join',
+  cta2Label: 'Explore Projects',
+  cta2Href: '/projects',
+  order: 0,
+  active: true,
+};
 
 export function AdminCarousel() {
   const [slides, setSlides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingSlide, setEditingSlide] = useState<any>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [form, setForm] = useState(EMPTY);
 
   useEffect(() => {
-    loadSlides();
+    refresh();
   }, []);
 
-  const loadSlides = async () => {
+  const refresh = async () => {
+    setLoading(true);
     try {
       const data = await fetchCarousel();
       setSlides(data);
     } catch (err) {
       console.error(err);
+      toast.error('Failed to load slides');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const openAdd = () => {
+    setEditing(null);
+    setForm(EMPTY);
+    setModalOpen(true);
+  };
+
+  const openEdit = (slide: any) => {
+    setEditing(slide);
+    setForm({
+      image: slide.image,
+      badge: slide.badge || '',
+      heading: slide.heading,
+      description: slide.description || '',
+      cta1Label: slide.cta1Label || 'Join RSIC — Free',
+      cta1Href: slide.cta1Href || '/join',
+      cta2Label: slide.cta2Label || 'Explore Projects',
+      cta2Href: slide.cta2Href || '/projects',
+      order: slide.order || 0,
+      active: slide.active ?? true,
+    });
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const data = {
-      image: formData.get('image'),
-      badge: formData.get('badge'),
-      heading1: formData.get('heading1'),
-      cta1Label: formData.get('cta1Label'),
-      cta1Href: formData.get('cta1Href'),
-      cta2Label: formData.get('cta2Label'),
-      cta2Href: formData.get('cta2Href'),
-      order: Number(formData.get('order')),
-      active: true,
-    };
-
     try {
-      if (editingSlide) {
-        await updateDoc('carousel', editingSlide._id, data);
+      if (editing) {
+        await updateDoc('carousel', editing._id, form);
+        toast.success('Slide updated');
       } else {
-        await createDoc('carousel', data);
+        await createDoc('carousel', form);
+        toast.success('Slide created');
       }
-      setShowForm(false);
-      setEditingSlide(null);
-      loadSlides();
+      setModalOpen(false);
+      refresh();
     } catch (err) {
-      alert('Error saving slide');
+      console.error(err);
+      toast.error('Failed to save slide');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this slide?')) return;
-    try {
-      await deleteDoc('carousel', id);
-      loadSlides();
-    } catch (err) {
-      alert('Error deleting slide');
+  const handleDelete = async () => {
+    if (deleteId) {
+      try {
+        await deleteDoc('carousel', deleteId);
+        toast.success('Slide deleted');
+        refresh();
+        setDeleteId(null);
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to delete slide');
+      }
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading slides...</div>;
+  const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }));
 
   return (
-    <div className="p-8 max-w-7xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <div className="flex justify-between items-center mb-8">
+    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>Carousel Management</h1>
-          <p className="text-gray-500 text-sm">Manage the hero slides on your homepage.</p>
+          <h1 className="text-gray-900 mb-1" style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.6rem', fontWeight: 800 }}>Carousel Management</h1>
+          <p className="text-gray-500 text-sm">{slides.length} slides active on homepage</p>
         </div>
         <button
-          onClick={() => { setEditingSlide(null); setShowForm(true); }}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#4A0000] text-white rounded-xl font-semibold hover:bg-[#3A0000] transition-colors"
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 hover:scale-105"
+          style={{ background: '#4A0000' }}
         >
-          <Plus size={18} /> Add New Slide
+          <Plus size={16} /> Add New Slide
         </button>
       </div>
 
-      <AnimatePresence>
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="mb-8 p-6 bg-white rounded-2xl border border-gray-200 shadow-xl"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">{editingSlide ? 'Edit Slide' : 'New Slide'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
-            </div>
-            
-            <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
-                  <input name="image" defaultValue={editingSlide?.image} required className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="https://..." />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Badge Text</label>
-                  <input name="badge" defaultValue={editingSlide?.badge} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="🏆 Winner of..." />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Heading</label>
-                  <input name="heading1" defaultValue={editingSlide?.heading1} required className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="Building Future" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">CTA 1 Label</label>
-                    <input name="cta1Label" defaultValue={editingSlide?.cta1Label || 'Join RSIC — Free'} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">CTA 1 Link</label>
-                    <input name="cta1Href" defaultValue={editingSlide?.cta1Href || '/join'} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">CTA 2 Label</label>
-                    <input name="cta2Label" defaultValue={editingSlide?.cta2Label || 'Explore Projects'} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">CTA 2 Link</label>
-                    <input name="cta2Href" defaultValue={editingSlide?.cta2Href || '/projects'} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Display Order</label>
-                  <input type="number" name="order" defaultValue={editingSlide?.order || 0} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" />
-                </div>
-              </div>
-
-              <div className="md:col-span-2 flex justify-end gap-3 pt-4 border-top border-gray-100">
-                <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 rounded-lg font-bold text-gray-600 hover:bg-gray-100 transition-colors">Cancel</button>
-                <button type="submit" className="flex items-center gap-2 px-8 py-2.5 rounded-lg bg-[#4A0000] text-white font-bold hover:shadow-lg transition-all"><Save size={18} /> {editingSlide ? 'Update Slide' : 'Create Slide'}</button>
-              </div>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="grid grid-cols-1 gap-4">
-        {slides.map((slide, i) => (
-          <motion.div
-            key={slide._id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6 items-center"
-          >
-            <div className="w-full md:w-48 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 relative group">
-              <img src={slide.image} alt={slide.heading1} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <ImageIcon className="text-white" size={24} />
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="px-2 py-0.5 rounded-md bg-gray-100 text-[10px] font-bold text-gray-500 uppercase">Order: {slide.order}</span>
-                {slide.active ? (
-                  <span className="px-2 py-0.5 rounded-md bg-green-100 text-[10px] font-bold text-green-600 uppercase">Active</span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-md bg-red-100 text-[10px] font-bold text-red-600 uppercase">Inactive</span>
-                )}
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 line-clamp-1">{slide.heading1}</h3>
-            </div>
-
-            <div className="flex gap-2 flex-shrink-0">
-              <button
-                onClick={() => { setEditingSlide(slide); setShowForm(true); }}
-                className="p-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-[#4A0000] hover:text-white transition-all"
-                title="Edit Slide"
-              >
-                <Edit3 size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(slide._id)}
-                className="p-3 rounded-xl bg-gray-100 text-gray-300 hover:bg-red-500 hover:text-white transition-all"
-                title="Delete Slide"
-              >
-                <Trash2 size={18} />
-              </button>
-            </div>
-          </motion.div>
-        ))}
-
-        {slides.length === 0 && !showForm && (
-          <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-            <ImageIcon className="mx-auto mb-4 text-gray-300" size={48} />
-            <h3 className="text-lg font-bold text-gray-400">No slides managed in database</h3>
-            <p className="text-gray-400 text-sm mb-6">The website is currently using hardcoded fallback slides.</p>
-            <button
-              onClick={() => { setEditingSlide(null); setShowForm(true); }}
-              className="px-6 py-2.5 bg-[#4A0000] text-white rounded-xl font-bold hover:shadow-lg transition-all"
+        {loading ? <div className="text-center py-12">Loading...</div> :
+          slides.map((slide, i) => (
+            <motion.div
+              key={slide._id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6 items-center group"
             >
-              Add First Slide
-            </button>
+              <div className="w-full md:w-56 h-36 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 relative">
+                <img src={slide.image} alt={slide.heading} className="w-full h-full object-cover" />
+                <div className="absolute top-2 left-2 px-2 py-1 rounded bg-black/50 backdrop-blur-md text-[10px] font-bold text-white uppercase">
+                  Order: {slide.order}
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                {slide.badge && (
+                  <span className="inline-block px-3 py-1 rounded-full bg-red-50 text-[#4A0000] text-[10px] font-bold uppercase tracking-wider mb-2">
+                    {slide.badge}
+                  </span>
+                )}
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{slide.heading}</h3>
+                <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">{slide.description}</p>
+                
+                <div className="flex gap-4 mt-4">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <ArrowRight size={10} /> {slide.cta1Label || 'N/A'}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <ArrowRight size={10} /> {slide.cta2Label || 'N/A'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => openEdit(slide)}
+                  className="p-3 rounded-xl bg-gray-50 text-gray-400 hover:text-[#4A0000] hover:bg-red-50 transition-all"
+                >
+                  <Edit3 size={18} />
+                </button>
+                <button
+                  onClick={() => setDeleteId(slide._id)}
+                  className="p-3 rounded-xl bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+
+        {!loading && slides.length === 0 && (
+          <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+            <ImageIcon className="mx-auto mb-4 text-gray-200" size={64} />
+            <h3 className="text-lg font-bold text-gray-400">No Custom Slides</h3>
+            <p className="text-gray-400 text-sm">Homepage is currently showing default branded content.</p>
           </div>
         )}
       </div>
+
+      <AdminModal
+        open={modalOpen}
+        title={editing ? 'Edit Slide' : 'New Slide'}
+        onClose={() => setModalOpen(false)}
+        width="max-w-3xl"
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Hero Heading" required>
+              <input 
+                required 
+                value={form.heading} 
+                onChange={e => set('heading', e.target.value)} 
+                placeholder="e.g. Building Future Innovators" 
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#4A0000] focus:ring-2 focus:ring-[#4A0000]/10 transition-all" 
+              />
+            </FormField>
+            <FormField label="Badge Text (optional)">
+              <input 
+                value={form.badge} 
+                onChange={e => set('badge', e.target.value)} 
+                placeholder="e.g. 🏆 NATIONAL WINNERS" 
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#4A0000] focus:ring-2 focus:ring-[#4A0000]/10 transition-all" 
+              />
+            </FormField>
+          </div>
+
+          <FormField label="Hero Description" required>
+            <textarea 
+              required 
+              value={form.description} 
+              onChange={e => set('description', e.target.value)} 
+              rows={3} 
+              placeholder="Tell your story in 1-2 powerful sentences..." 
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#4A0000] focus:ring-2 focus:ring-[#4A0000]/10 transition-all resize-none" 
+            />
+          </FormField>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ImageUpload 
+              label="Hero Background Image" 
+              value={form.image} 
+              onChange={url => set('image', url)} 
+            />
+            <div className="space-y-4">
+              <FormField label="Display Order">
+                <input 
+                  type="number" 
+                  value={form.order} 
+                  onChange={e => set('order', +e.target.value)} 
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#4A0000] focus:ring-2 focus:ring-[#4A0000]/10 transition-all" 
+                />
+              </FormField>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <FormField label="CTA 1 Text">
+                  <input value={form.cta1Label} onChange={e => set('cta1Label', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs" />
+                </FormField>
+                <FormField label="CTA 1 Link">
+                  <input value={form.cta1Href} onChange={e => set('cta1Href', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs" />
+                </FormField>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <FormField label="CTA 2 Text">
+                  <input value={form.cta2Label} onChange={e => set('cta2Label', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs" />
+                </FormField>
+                <FormField label="CTA 2 Link">
+                  <input value={form.cta2Href} onChange={e => set('cta2Href', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs" />
+                </FormField>
+              </div>
+            </div>
+          </div>
+
+          <FormActions 
+            onCancel={() => setModalOpen(false)} 
+            submitLabel={editing ? 'Save Changes' : 'Create Slide'} 
+          />
+        </form>
+      </AdminModal>
+
+      <AdminConfirm
+        open={!!deleteId}
+        message="This carousel slide will be permanently removed from the homepage gallery."
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 }
