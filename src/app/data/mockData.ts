@@ -11,12 +11,12 @@ export const BRAND = {
   location: 'Dhaka, Bangladesh',
   founded: '2023',
   social: {
-    facebook: 'https://facebook.com/rizqara',
-    twitter: 'https://twitter.com/rizqara',
-    instagram: 'https://instagram.com/rizqara',
-    linkedin: 'https://linkedin.com/company/rizqara',
-    youtube: 'https://youtube.com/@rizqara',
-    github: 'https://github.com/rizqara',
+    facebook: 'https://www.facebook.com/rizqarascienceandinnovationclub/',
+    twitter: 'https://x.com/Rizqaratech',
+    instagram: 'https://www.instagram.com/rizqaratech/',
+    linkedin: 'https://www.linkedin.com/company/rizqara-tech',
+    youtube: 'https://www.youtube.com/@rizqaratech/shorts',
+    github: 'https://github.com/royestheking-a11y',
   },
 };
 
@@ -57,7 +57,7 @@ export const PROJECTS = [
       'https://images.unsplash.com/photo-1772272935464-2e90d8218987?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
     ],
     team: ['Rizqara Core Team', 'AI Division'],
-    link: 'https://admissionbondu.com',
+    link: 'https://admissionbondu.me',
     color: '#800020',
   },
   {
@@ -88,7 +88,7 @@ export const PROJECTS = [
       'https://images.unsplash.com/photo-1759505017950-25e0733b9e68?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
     ],
     team: ['Rizqara Dev Team', 'Design Division'],
-    link: 'https://elevatecv.rizqara.org',
+    link: 'https://elevatecvs.vercel.app/',
     color: '#1a4a7a',
   },
   {
@@ -118,7 +118,7 @@ export const PROJECTS = [
       'https://images.unsplash.com/photo-1724986211720-87b06808fe90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
     ],
     team: ['Rizqara Dev Team', 'Education Division'],
-    link: 'https://pengu.rizqara.org',
+    link: 'https://www.pengui.tech/',
     color: '#2d6a4f',
   },
   {
@@ -148,7 +148,7 @@ export const PROJECTS = [
       'https://images.unsplash.com/photo-1765133469414-02f4e445df19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
     ],
     team: ['Rizqara Dev Team', 'Security Division'],
-    link: '#',
+    link: 'https://vocamessenger.vercel.app/',
     color: '#6b2d5e',
   },
   {
@@ -178,7 +178,7 @@ export const PROJECTS = [
       'https://images.unsplash.com/photo-1775185172785-4bbd6b0fc8f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
     ],
     team: ['Rizqara Dev Team', 'Healthcare Division'],
-    link: '#',
+    link: 'https://jeevita.vercel.app/',
     color: '#1a5276',
   },
 ];
