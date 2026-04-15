@@ -34,6 +34,7 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminPrograms } from './pages/admin/AdminPrograms';
 import { AdminAchievements } from './pages/admin/AdminAchievements';
 import { AdminGallery } from './pages/admin/AdminGallery';
+import { AdminCarousel } from './pages/admin/AdminCarousel';
 
 export const router = createBrowserRouter([
   {
@@ -80,6 +81,7 @@ export const router = createBrowserRouter([
       { path: 'gallery', Component: AdminGallery },
       { path: 'messages', Component: AdminMessages },
       { path: 'donations', Component: AdminDonations },
+      { path: 'carousel', Component: AdminCarousel },
       { path: 'settings', Component: AdminSettings },
     ],
   },

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { STATS } from '../data/mockData';
-import { fetchProjects, fetchPrograms, fetchAchievements } from '../data/api';
+import { fetchProjects, fetchPrograms, fetchAchievements, fetchCarousel } from '../data/api';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -83,11 +83,15 @@ export function Home() {
   const [projects, setProjects] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
+  const [carousel, setCarousel] = useState<any[]>([]);
 
   useEffect(() => {
-    Promise.all([fetchProjects(), fetchPrograms(), fetchAchievements()])
-      .then(([prjs, prgs, achs]) => {
-        setProjects(prjs); setPrograms(prgs); setAchievements(achs);
+    Promise.all([fetchProjects(), fetchPrograms(), fetchAchievements(), fetchCarousel()])
+      .then(([prjs, prgs, achs, sls]) => {
+        setProjects(prjs); 
+        setPrograms(prgs); 
+        setAchievements(achs);
+        setCarousel(sls.length > 0 ? sls : HERO_SLIDES);
       })
       .catch(console.error);
   }, []);
@@ -99,12 +103,13 @@ export function Home() {
   }, []);
 
   const nextSlide = useCallback(() => {
-    goToSlide((currentSlide + 1) % HERO_SLIDES.length, 1);
-  }, [currentSlide, goToSlide]);
+    goToSlide((currentSlide + 1) % (carousel.length || HERO_SLIDES.length), 1);
+  }, [currentSlide, goToSlide, carousel.length]);
 
   const prevSlide = useCallback(() => {
-    goToSlide((currentSlide - 1 + HERO_SLIDES.length) % HERO_SLIDES.length, -1);
-  }, [currentSlide, goToSlide]);
+    const len = carousel.length || HERO_SLIDES.length;
+    goToSlide((currentSlide - 1 + len) % len, -1);
+  }, [currentSlide, goToSlide, carousel.length]);
 
   useEffect(() => {
     if (isHovered) return;
@@ -112,7 +117,10 @@ export function Home() {
     return () => clearInterval(timer);
   }, [isHovered, nextSlide]);
 
-  const slide = HERO_SLIDES[currentSlide];
+  const activeSlides = carousel.length > 0 ? carousel : HERO_SLIDES;
+  const slide = activeSlides[currentSlide];
+
+  if (!slide) return null;
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -208,18 +216,18 @@ export function Home() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  to={slide.cta1.href}
+                  to={slide.cta1?.href || '#'}
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 hover:shadow-2xl"
                   style={{ background: '#fff', color: '#4A0000' }}
                 >
-                  Join RSIC — Free <ArrowRight size={20} />
+                  {slide.cta1?.label || 'Join Now'} <ArrowRight size={20} />
                 </Link>
                 <Link
-                  to={slide.cta2.href}
+                  to={slide.cta2?.href || '#'}
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg border-2 border-white/30 text-white hover:bg-white/10 transition-all"
                   style={{ backdropFilter: 'blur(8px)' }}
                 >
-                  {slide.cta2.label}
+                  {slide.cta2?.label || 'Learn More'}
                 </Link>
               </div>
             </motion.div>
@@ -241,7 +249,7 @@ export function Home() {
 
         {/* Dot Indicators */}
         <div className="absolute bottom-10 right-6 md:right-12 z-20 flex flex-col gap-2">
-          {HERO_SLIDES.map((_, i) => (
+          {activeSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i, i > currentSlide ? 1 : -1)}

@@ -91,3 +91,9 @@ export const saveSubmission = async (type: 'donation' | 'contact' | 'application
   if (!res.ok) throw new Error('Submission failed');
   return res.json();
 };
+
+export const fetchCarousel = async () => {
+  const res = await fetch(`${API_BASE}/api/carousel`);
+  if (!res.ok) throw new Error('Failed to fetch carousel');
+  return res.json();
+};

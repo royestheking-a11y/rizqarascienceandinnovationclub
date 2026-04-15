@@ -26,6 +26,7 @@ const NAV_GROUPS = [
       { icon: CalendarDays, label: 'Events', path: '/admin/events' },
       { icon: FileText, label: 'Blog Posts', path: '/admin/blog' },
       { icon: Image, label: 'Gallery', path: '/admin/gallery' },
+      { icon: Image, label: 'Carousel', path: '/admin/carousel' },
     ],
   },
   {

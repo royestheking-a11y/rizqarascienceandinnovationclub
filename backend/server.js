@@ -22,6 +22,7 @@ const Blog = require('./models/Blog');
 const Gallery = require('./models/Gallery');
 const Member = require('./models/Member');
 const Certificate = require('./models/Certificate');
+const CarouselSlide = require('./models/CarouselSlide');
 
 const app = express();
 
@@ -170,10 +171,13 @@ app.get('/api/submissions', async (req, res) => {
   }
 });
 
-app.get('/api/certificates/v/:slug', async (req, res) => {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/carousel', async (req, res) => {
   try {
-    const data = await Certificate.findOne({ slug: req.params.slug });
-    if (!data) return res.status(404).json({ error: 'Certificate not found' });
+    const data = await CarouselSlide.find({ active: true }).sort({ order: 1 });
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -203,7 +207,8 @@ const getModel = (model) => {
     blog: Blog, 
     gallery: Gallery, 
     members: Member,
-    certificates: Certificate
+    certificates: Certificate,
+    carousel: CarouselSlide
   };
   return models[model];
 };
