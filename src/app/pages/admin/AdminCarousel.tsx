@@ -31,9 +31,6 @@ export function AdminCarousel() {
       image: formData.get('image'),
       badge: formData.get('badge'),
       heading1: formData.get('heading1'),
-      heading2: formData.get('heading2'),
-      accent: formData.get('accent'),
-      sub: formData.get('sub'),
       cta1Label: formData.get('cta1Label'),
       cta1Href: formData.get('cta1Href'),
       cta2Label: formData.get('cta2Label'),
@@ -107,24 +104,12 @@ export function AdminCarousel() {
                   <input name="badge" defaultValue={editingSlide?.badge} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="🏆 Winner of..." />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Heading 1</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Heading</label>
                   <input name="heading1" defaultValue={editingSlide?.heading1} required className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="Building Future" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Heading 2</label>
-                  <input name="heading2" defaultValue={editingSlide?.heading2} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="Innovators" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Accent Text</label>
-                  <input name="accent" defaultValue={editingSlide?.accent} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="Through Science & Tech" />
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Subtext (Description)</label>
-                  <textarea name="sub" defaultValue={editingSlide?.sub} rows={3} className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 outline-none focus:ring-2 focus:ring-[#4A0000]/20" placeholder="A global community..." />
-                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">CTA 1 Label</label>
@@ -185,9 +170,7 @@ export function AdminCarousel() {
                   <span className="px-2 py-0.5 rounded-md bg-red-100 text-[10px] font-bold text-red-600 uppercase">Inactive</span>
                 )}
               </div>
-              <h3 className="text-lg font-bold text-gray-900 line-clamp-1">{slide.heading1} {slide.heading2}</h3>
-              <p className="text-gray-500 text-sm italic mb-2">{slide.accent}</p>
-              <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">{slide.sub}</p>
+              <h3 className="text-lg font-bold text-gray-900 line-clamp-1">{slide.heading1}</h3>
             </div>
 
             <div className="flex gap-2 flex-shrink-0">

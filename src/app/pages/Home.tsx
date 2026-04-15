@@ -191,27 +191,11 @@ export function Home() {
 
               {/* Heading */}
               <h1
-                className="text-white mb-3"
+                className="text-white mb-10"
                 style={{ fontSize: 'clamp(2.8rem, 6vw, 5.5rem)', fontFamily: 'Playfair Display, serif', lineHeight: 1.1, fontWeight: 800 }}
               >
                 {slide.heading1}
-                <br />
-                <span style={{ color: '#fff' }}>{slide.heading2}</span>
               </h1>
-
-              <div className="text-center mb-5">
-                <span className="inline-block px-6 py-2 rounded-full text-base font-semibold" style={{ background: 'rgba(255,255,255,0.1)', color: '#ffb3c1', border: '1px solid rgba(255,179,193,0.3)', backdropFilter: 'blur(8px)' }}>
-                  {slide.accent}
-                </span>
-              </div>
-
-              {/* Sub */}
-              <p
-                className="text-white/75 max-w-2xl mx-auto mb-10"
-                style={{ fontSize: '1.15rem', lineHeight: 1.85 }}
-              >
-                {slide.sub}
-              </p>
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
