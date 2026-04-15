@@ -171,6 +171,12 @@ app.get('/api/submissions', async (req, res) => {
   }
 });
 
+app.get('/api/certificates/v/:slug', async (req, res) => {
+  try {
+    const data = await Certificate.findOne({ slug: req.params.slug });
+    if (!data) return res.status(404).json({ error: 'Certificate not found' });
+    res.json(data);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
