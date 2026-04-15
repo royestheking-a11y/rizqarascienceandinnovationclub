@@ -1,6 +1,6 @@
 # RSIC — Rizqara Science & Innovation Club
 
-![RSIC Banner]https://scontent.fdac177-2.fna.fbcdn.net/v/t39.30808-6/668295022_122108989083285497_8939487573721088208_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=2a1932&_nc_ohc=w8srC6nMyCoQ7kNvwGkrItX&_nc_oc=AdrULMbxOXnr0rcWN2IHxdUj2QVMx7DYsFxRk-HH33lRYfeYy3xp5wNXdKPnr9XmkZM&_nc_zt=23&_nc_ht=scontent.fdac177-2.fna&_nc_gid=MDazgx9LU9RtAgeKVrZHwA&_nc_ss=7a3a8&oh=00_Af2cgd8M-v-zaPsaqp5_NxxaNlM0k_MdXUe_FS8fkC3W4A&oe=69E5B893
+![RSIC Banner]https://drive.google.com/file/d/1zaGxCwA3V_UgbVR8SZ6hRkFtlf3fUERu/view?usp=drive_link
 
 Welcome to the official digital platform of the **Rizqara Science & Innovation Club (RSIC)**. This is a premium, full-stack ecosystem designed to empower students through technology, science, and real-world innovation.
 
