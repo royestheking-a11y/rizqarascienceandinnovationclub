@@ -271,4 +271,36 @@ app.delete('/api/:model/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5555;
+
+// Self-ping to prevent Render from sleeping
+const https = require('https');
+const http = require('http');
+
+// Automatically detect URL: 
+// 1. Manual override (BACKEND_URL)
+// 2. Render auto-detection (RENDER_EXTERNAL_URL)
+// 3. Local fallback (http://localhost:PORT)
+const SELF_PING_URL = process.env.BACKEND_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+
+if (SELF_PING_URL) {
+  const protocol = SELF_PING_URL.startsWith('https') ? https : http;
+  
+  // Ping every 14 minutes (840000 ms) to keep-alive
+  setInterval(() => {
+    protocol.get(SELF_PING_URL, (res) => {
+      if (res.statusCode === 200) {
+        console.log(`[${new Date().toISOString()}] Self-ping successful: ${res.statusCode}`);
+      } else {
+        console.warn(`[${new Date().toISOString()}] Self-ping returned status: ${res.statusCode}`);
+      }
+    }).on('error', (err) => {
+      console.error(`[${new Date().toISOString()}] Self-ping failed: ${err.message}`);
+    });
+  }, 840000); 
+  
+  console.log(`Self-ping system initialized for: ${SELF_PING_URL}`);
+}
+
+
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
